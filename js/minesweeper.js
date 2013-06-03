@@ -1,27 +1,46 @@
-var s,
-MineSweeper = {
+;(function ( $ ) {
+      if ( ! $.MineSweeper ) {
+        $.MineSweeper = {};
+      }
+    $.MineSweeper.myMineSweeper = function ( el, myMineSweeperParam, options ) {
 
-  settings: {
-    numBoardSize: 5,
-    numMines: $("#article-list"),
-    startButton: $("#start-button"),
-    endButton: $("#end-button")
-  },
+        // To avoid scope issues, use 'base' instead of 'this'
+        // to reference this class from internal events and functions.
+        var base = this;
+    
+        // Access to jQuery and DOM versions of element
+        base.$el = $( el );
+        base.el = el;
 
-  init: function() {
-    s = this.settings;
-    this.bindUIActions();
-  },
+        // Add a reverse reference to the DOM object
+        base.$el.data( "MineSweeper.myMineSweeper" , base );
 
-  bindUIActions: function() {
-    s.startButton.on("click", function() {
-      MineSweeper.startGame(s.numBoardSize);
-    });
-  },
+        base.init = function () {
+          base.myMineSweeperParam = myMineSweeperParam;
 
-  startGame: function(numTiles) {
-    // $.ajax or something
-    // using numTiles as param
-  }
+          base.settings = $.extend( {}, $.MineSweeper.myMineSweeper.defaults, options );
 
-};
+          // Put your initialization code here
+
+        };
+
+        // Sample Function, Uncomment to use
+        // base.functionName = function( paramaters ){
+        //
+        // };
+
+        // Run initializer
+        base.init();
+      };
+
+      $.MineSweeper.myMineSweeper.defaults = {
+        myDefaultValue: ""
+      };
+
+      $.fn.MineSweeper_myMineSweeper = function( myMineSweeperParam, options ) {
+        return this.each( function () {
+          ( new $.MineSweeper.myMineSweeper( this, myMineSweeperParam, options ) );
+        });
+      };
+
+    } )( jQuery );
