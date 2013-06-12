@@ -1,46 +1,75 @@
-;(function ( $ ) {
-      if ( ! $.MineSweeper ) {
-        $.MineSweeper = {};
-      }
-    $.MineSweeper.myMineSweeper = function ( el, myMineSweeperParam, options ) {
+var s, MineSweeper = {
 
-        // To avoid scope issues, use 'base' instead of 'this'
-        // to reference this class from internal events and functions.
-        var base = this;
-    
-        // Access to jQuery and DOM versions of element
-        base.$el = $( el );
-        base.el = el;
+  var CELL_STATES = { NEW: 0, FLAG: 1, CLEAR: 2, BOMB: 3 };
 
-        // Add a reverse reference to the DOM object
-        base.$el.data( "MineSweeper.myMineSweeper" , base );
+  // SETTINGS
+  settings: {
+    divGame: $('#ms_game'),
+    numGrid: 8,  // GRID SIZE
+    numBombs: 4, // NUMBER OF BOMBS ON BOARD
+    startButton: $("#start-button"),  // START BUTTON
+    boardSquares: $("#board .square"),
+    resetButton: $('#reset-button')
 
-        base.init = function () {
-          base.myMineSweeperParam = myMineSweeperParam;
+  }
+  var ms_grid = [];
+  var ms_timer = null;
 
-          base.settings = $.extend( {}, $.MineSweeper.myMineSweeper.defaults, options );
+  init: function() {
+    // START THE GAME
+    s = this.settings;
+    var time_elapsed = 0;
+    this.startTimer();
+    this.bindUIActions();
+  }
 
-          // Put your initialization code here
+  startTimer(): function() {
+    $('#timer-count').text(this.zeroPad(0, 3));
+      clearInterval(timer);
+      var ms = this;
+      timer = window.setInterval(function(){
 
-        };
+        ms.timeElapsed++;
+        $('#score-time-count').text(ms.zeroPad(ms.timeElapsed, 3));
 
-        // Sample Function, Uncomment to use
-        // base.functionName = function( paramaters ){
-        //
-        // };
+      }, 1000);
+  },
 
-        // Run initializer
-        base.init();
-      };
+  bindUIActions: function() {
 
-      $.MineSweeper.myMineSweeper.defaults = {
-        myDefaultValue: ""
-      };
+    // START GAME
+    s.startButton.on("click", function() {
+      MineSweeper.startGame(s.numGrid, s.numBombs);
+    });
 
-      $.fn.MineSweeper_myMineSweeper = function( myMineSweeperParam, options ) {
-        return this.each( function () {
-          ( new $.MineSweeper.myMineSweeper( this, myMineSweeperParam, options ) );
-        });
-      };
+    // RESET GAME
+    s.resetButton.on('click', function(event) {
+      MineSweeper.init();
+    });
 
-    } )( jQuery );
+    // SURRENDER GAME
+    s.giveupButton.on('click', function(event) {
+      MineSweeper.giveUp();
+    });
+
+    // CELL CLICK
+    s.boardSquares.on('click', function(event){
+      MineSweeper.clickCell( $(this).attr('data-x'), $(this).attr('data-y') );
+    });
+
+    // FLAG CELL
+    s.boardSquares.on('contextmenu rightclick', function(e){
+      e.preventDefault();
+      MineSweeper.flagCell($(this).attr('data-x'), $(this).attr('data-y'));
+      return false;
+    });
+  },
+
+};
+
+(function() {
+
+//Start game
+MineSweeper.init();
+
+})();
