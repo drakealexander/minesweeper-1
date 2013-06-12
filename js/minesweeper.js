@@ -1,38 +1,54 @@
-var s, MineSweeper = {
-
-  var CELL_STATES = { NEW: 0, FLAG: 1, CLEAR: 2, BOMB: 3 };
+var s, 
+MineSweeper = {
 
   // SETTINGS
   settings: {
     divGame: $('#ms_game'),
     numGrid: 8,  // GRID SIZE
     numBombs: 4, // NUMBER OF BOMBS ON BOARD
+    timerInterval: 1000, // TIMER INTERVAL IN MILLISECS
+    timerStatus: 0, // 0 - TIMER STOPPED, 1 - TIMER RUNNING
     startButton: $("#start-button"),  // START BUTTON
+    giveupButton: $("#giveup-button"),  // START BUTTON
     boardSquares: $("#board .square"),
-    resetButton: $('#reset-button')
+    resetButton: $('#reset-button'),
+    timer: $('#ms_timer'),
+    CELL_STATES: { NEW: 0, FLAG: 1, CLEAR: 2, BOMB: 3 },
+    ms_grid: [],
+    ms_timer: null
+  },
 
-  }
-  var ms_grid = [];
-  var ms_timer = null;
 
   init: function() {
     // START THE GAME
     s = this.settings;
     var time_elapsed = 0;
-    this.startTimer();
     this.bindUIActions();
-  }
+  },
 
-  startTimer(): function() {
-    $('#timer-count').text(this.zeroPad(0, 3));
-      clearInterval(timer);
-      var ms = this;
-      timer = window.setInterval(function(){
+  startTimer: function() {
+    var interval = (typeof(s.timerInterval) !== 'undefined') ? s.timerInterval : 1000;
+    var start = new Date().getTime();
+    var time = 0;
+    var elapsed = '0.0';
+    function instance()
+    {
+        time += interval;
+        elapsed = Math.floor(time / interval) / 10;
+        if(Math.round(elapsed) == elapsed) { elapsed += '.0'; }
+        s.timer.html(elapsed);
+        var diff = (new Date().getTime() - start) - time;
+        window.setTimeout(instance, (interval - diff));
+    }
+    if(s.timerStatus == 0) {
+      s.timerStatus = 1;
+      window.setTimeout(instance, interval);
+    }
+  },
 
-        ms.timeElapsed++;
-        $('#score-time-count').text(ms.zeroPad(ms.timeElapsed, 3));
-
-      }, 1000);
+  startGame: function(grid, bombs) {
+        this.startTimer();
+        alert("Grid: " + grid + ", Bombs: " + bombs);
   },
 
   bindUIActions: function() {
@@ -63,7 +79,7 @@ var s, MineSweeper = {
       MineSweeper.flagCell($(this).attr('data-x'), $(this).attr('data-y'));
       return false;
     });
-  },
+  }
 
 };
 
